@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Webpage</title>
+    <!-- Include Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Add custom styles to ensure the footer stays at the bottom */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main {
+            flex: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Navbar section -->
+    <nav class="bg-blue-500 p-4 text-white flex justify-between items-center">
+        <!-- Left corner: Logo -->
+        <div class="flex items-center">
+            <!-- Add your logo here -->
+            <img src="path-to-your-logo.png" alt="Logo" class="h-8 w-8 mr-2">
+            <span class="text-xl font-bold">Your Logo Name</span>
+        </div>
+
+        <!-- Right corner: Home and Login links -->
+        <div class="space-x-4">
+            <a href="product.html">Add New Product</a>
+            <a href="#" class="text-white">Home</a>
+            <a href="#" class="text-white">Login</a>
+        </div>
+    </nav>
+
+    <!-- Form section -->
+    <main class="container mx-auto my-8 px-4">
+        <div class="max-w-lg mx-auto bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <h2 class="text-2xl font-bold mb-4">Add a New Product</h2>
+            <form id="productForm" class="space-y-4">
+                <div>
+                    <label for="productNumber" class="block text-gray-700 font-bold">Product Number:</label>
+                    <input type="number" name="productNumber" id="productNumber" class="form-input mt-1 block w-full border rounded py-2 px-3 text-gray-700">
+                </div>
+                <div>
+                    <label for="productName" class="block text-gray-700 font-bold">Product Name:</label>
+                    <input type="text" name="productName" id="productName" class="form-input mt-1 block w-full border rounded py-2 px-3 text-gray-700">
+                </div>
+                <div>
+                    <label for="startDate" class="block text-gray-700 font-bold">Start Date:</label>
+                    <input type="date" name="startDate" id="startDate" class="form-input mt-1 block w-full border rounded py-2 px-3 text-gray-700">
+                </div>
+                <div>
+                    <label for="endDate" class="block text-gray-700 font-bold">End Date:</label>
+                    <input type="date" name="endDate" id="endDate" class="form-input mt-1 block w-full border rounded py-2 px-3 text-gray-700">
+                </div>
+                <div>
+                    <label for="status" class="block text-gray-700 font-bold">Status:</label>
+                    <input type="text" name="status" id="status" class="form-input mt-1 block w-full border rounded py-2 px-3 text-gray-700">
+                </div>
+                <div>
+                    <label for="percentComplete" class="block text-gray-700 font-bold">Percent Complete:</label>
+                    <input type="number" name="percentComplete" id="percentComplete" class="form-input mt-1 block w-full border rounded py-2 px-3 text-gray-700">
+                </div>
+                <div>
+                    <button type="button" id="addProductBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add Product</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Product list -->
+        <h2 class="text-2xl font-bold mb-4">List of Projects</h2>
+        <table class="w-full border-collapse border border-gray-400">
+            <!-- ... (Previous table header code) ... -->
+            <tbody id="productListBody">
+                <!-- Project list items will be added here dynamically using JavaScript -->
+            </tbody>
+        </table>
+    </main>
+
+    <!-- Footer section -->
+    <footer class="bg-gray-300 p-4 text-center">
+        <p>© 2023 Your Website Name. All rights reserved.</p>
+    </footer>
+
+    <!-- ... (Previous Footer code) ... -->
+
+    <!-- JavaScript to dynamically populate project list items -->
+    <!-- ... (Previous JavaScript code) ... -->
+    <script>
+        function addProduct() {
+            const productForm = document.getElementById('productForm');
+            const formData = new FormData(productForm);
+
+            const productData = {};
+            formData.forEach((value, key) => {
+                productData[key] = value;
+            });
+
+            fetch('/api/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(productData),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                productForm.reset();
+                fetchProducts();
+            })
+            .catch((error) => {
+                console.error('Error adding product:', error);
+                alert('Error adding product. Please try again later.');
+            });
+        }
+
+        function fetchProducts() {
+            fetch('/api/products')
+                .then((response) => response.json())
+                .then((products) => {
+                    const productListBody = document.getElementById('productListBody');
+                    productListBody.innerHTML = '';
+
+                    products.forEach((product) => {
+                        const productRow = createProductRow(product);
+                        productListBody.innerHTML += productRow;
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error fetching products:', error);
+                });
+        }
+
+        function createProductRow(product) {
+    const formattedStartDate = new Date(product.startDate).toLocaleDateString();
+    const formattedEndDate = new Date(product.endDate).toLocaleDateString();
+
+    return `
+        <tr class="border-b border-gray-400">
+            <td class="px-6 py-4">${product.productNumber}</td>
+            <td class="px-6 py-4">${product.productName}</td>
+            <td class="px-6 py-4">${formattedStartDate}</td>
+            <td class="px-6 py-4">${formattedEndDate}</td>
+            <td class="px-6 py-4">${product.status}</td>
+            <td class="px-6 py-4">
+                <div class="relative h-6 w-36 rounded-full bg-gray-300">
+                    <div class="absolute h-6 rounded-full bg-blue-500" style="width: ${product.percentComplete}%;"></div>
+                </div>
+            </td>
+        </tr>
+    `;
+}
+
+
+        const addProductBtn = document.getElementById('addProductBtn');
+        addProductBtn.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent form submission
+            addProduct();
+        });
+
+        // Fetch products on page load
+        fetchProducts();
+    </script>
+</body>
+</html>

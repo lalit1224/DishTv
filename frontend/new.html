@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Webpage</title>
+    <!-- Include Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Add custom styles to ensure the footer stays at the bottom */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main {
+            flex: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Navbar section -->
+    <nav class="bg-blue-500 p-4 text-white flex justify-between items-center">
+        <!-- Left corner: Logo -->
+        <div class="flex items-center">
+            <!-- Add your logo here -->
+            <img src="path-to-your-logo.png" alt="Logo" class="h-8 w-8 mr-2">
+            <span class="text-xl font-bold">Your Logo Name</span>
+        </div>
+
+        <!-- Right corner: Home and Login links -->
+        <div class="space-x-4">
+            <a href="#" class="text-white">Home</a>
+            <a href="#" class="text-white">Login</a>
+        </div>
+    </nav>
+
+    <!-- Projects section -->
+    <main class="container mx-auto my-8">
+        <h2 class="text-2xl font-bold mb-4">List of Projects</h2>
+        <table class="w-full border-collapse border border-gray-400">
+            <thead>
+                <tr>
+                    <th class="px-6 py-4 text-left bg-gray-200">Product number</th>
+                    <th class="px-6 py-4 text-left bg-gray-200">Product name</th>
+                    <th class="px-6 py-4 text-left bg-gray-200">Start date</th>
+                    <th class="px-6 py-4 text-left bg-gray-200">End date</th>
+                    <th class="px-6 py-4 text-left bg-gray-200">Status</th>
+                    <th class="px-6 py-4 text-left bg-gray-200">Percent complete</th>
+                </tr>
+            </thead>
+            <tbody id="productListBody">
+                <!-- Project list items will be added here dynamically using JavaScript -->
+            </tbody>
+        </table>
+    </main>
+
+    <!-- Footer section -->
+    <footer class="bg-gray-300 p-4 text-center">
+        <p>© 2023 Your Website Name. All rights reserved.</p>
+    </footer>
+
+    <!-- JavaScript to dynamically populate project list items -->
+    <script>
+        // Function to fetch products from the backend and display them on the page
+        function fetchProducts() {
+            fetch('/api/products') // Assuming the backend server is running on the same domain
+                .then((response) => response.json())
+                .then((data) => {
+                    const productListBody = document.getElementById('productListBody');
+                    productListBody.innerHTML = '';
+
+                    data.forEach((project) => {
+                        const projectItem = document.createElement('tr');
+                        projectItem.innerHTML = `
+                            <td class="px-6 py-4">${project.number}</td>
+                            <td class="px-6 py-4">${project.name}</td>
+                            <td class="px-6 py-4">${project.startDate}</td>
+                            <td class="px-6 py-4">${project.endDate}</td>
+                            <td class="px-6 py-4">${project.status}</td>
+                            <td class="px-6 py-4">
+                                <div class="relative h-6 w-36 rounded-full bg-gray-300">
+                                    <div class="absolute h-6 rounded-full bg-blue-500" style="width: ${project.percentComplete}%;">
+                                        <span class="px-2 text-white">${project.percentComplete}%</span>
+                                    </div>
+                                </div>
+                            </td>
+                        `;
+                        productListBody.appendChild(projectItem);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error fetching products:', error);
+                });
+        }
+
+        // Fetch initial product list on page load
+        fetchProducts();
+    </script>
+
+</body>
+</html>
